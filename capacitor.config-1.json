@@ -1,0 +1,13 @@
+{
+  "appId": "com.strategy.analyzer",
+  "appName": "Strategy Analyzer",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}
