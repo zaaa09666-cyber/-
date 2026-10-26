@@ -30,6 +30,28 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Apply custom icon
+        run: |
+          ICON=$(ls icon.png icon.jpg icon.jpeg icon.webp 2>/dev/null | head -1)
+          if [ -z "$ICON" ]; then
+            echo "No custom icon found, keeping default"
+            exit 0
+          fi
+          IM=$(command -v magick || command -v convert || true)
+          if [ -z "$IM" ]; then
+            sudo apt-get update && sudo apt-get install -y imagemagick
+            IM=$(command -v magick || command -v convert)
+          fi
+          RES=android/app/src/main/res
+          rm -rf $RES/mipmap-anydpi-v26
+          for spec in mdpi:48 hdpi:72 xhdpi:96 xxhdpi:144 xxxhdpi:192; do
+            dir=${spec%%:*}
+            size=${spec##*:}
+            mkdir -p $RES/mipmap-$dir
+            $IM "$ICON" -resize ${size}x${size}^ -gravity center -extent ${size}x${size} $RES/mipmap-$dir/ic_launcher.png
+            cp $RES/mipmap-$dir/ic_launcher.png $RES/mipmap-$dir/ic_launcher_round.png
+          done
+
       - name: Sync web assets
         run: npx cap sync android
 
